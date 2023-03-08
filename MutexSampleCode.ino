@@ -136,10 +136,10 @@ void TaskCore1(void *pvParameters)
         // Release the mutex lock
         myMutex.unlock();
 
-        // Implement the stepper motor code here
+        // Implement the stepper motor code here 
 
         // Delay for some time
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
