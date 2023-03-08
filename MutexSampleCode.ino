@@ -88,7 +88,6 @@ void messageHandler(char *topic, byte *payload, unsigned int length)
     Serial.print("incoming: ");
     Serial.println(topic);
 
-
     myMutex.lock();
 
     // Read in the variable.
@@ -112,25 +111,7 @@ void messageHandler(char *topic, byte *payload, unsigned int length)
 
     myMutex.unlock();
 
-    // // If both the steppers are not running, then move them (sending the task to core 1)
-    // if (stepper_X.isRunning() == false && stepper_Y.isRunning() == false)
-    // {
-    //     TaskParams params = {xReceived, yReceived, xSpd, ySpd};
-    //     xTaskCreatePinnedToCore(
-    //         core1_task,       // Function that should be called
-    //         "stepper moving", // Name of the task (for debugging)
-    //         10000,            // Stack size (bytes)
-    //         &params,          // Parameter to pass
-    //         1,                // Task priority
-    //         &stepperControl,  // Task handle
-    //         1                 // Select Which Core
-    //     );
-    //     Serial.println("Not running I think");
-    // }
-    // else
-    // {
-    //     Serial.println("running I think");
-    // }
+    // Now the TaskCore1 task can operate 
 
     prevX = xReceived;
     prevY = yReceived;
@@ -146,14 +127,16 @@ void TaskCore1(void *pvParameters)
         // Acquire the mutex lock
         myMutex.lock();
 
-        // Access and modify the shared resource
-        (*xReceived)++;
+        // Deep copy the shared resource to a new variable 
+        int xReceivedCopy = *xReceived;
 
         // Print the shared value
         Serial.println("TaskCore1: sharedValue = " + String(*xReceived));
 
         // Release the mutex lock
         myMutex.unlock();
+
+        // Implement the stepper motor code here
 
         // Delay for some time
         vTaskDelay(10 / portTICK_PERIOD_MS);
